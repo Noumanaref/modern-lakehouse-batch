@@ -1,0 +1,33 @@
+{
+  "name": "Modern Lakehouse Batch Pipeline",
+  "image": "mcr.microsoft.com/devcontainers/python:3.10",
+
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17"
+    }
+  },
+
+  "forwardPorts": [8080, 8081, 7077, 4040],
+  "portsAttributes": {
+    "8080": { "label": "Airflow Webserver" },
+    "8081": { "label": "Spark Master UI" },
+    "7077": { "label": "Spark Master (internal)" },
+    "4040": { "label": "Spark Application UI" }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "ms-azuretools.vscode-docker",
+        "redhat.vscode-yaml"
+      ]
+    }
+  },
+
+  "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt",
+  "remoteUser": "vscode"
+}

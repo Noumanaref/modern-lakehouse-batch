@@ -1,0 +1,10 @@
+# Local dev / ingestion scripts — NOT the Airflow/Spark container dependencies,
+# those are pinned separately inside docker-compose.yml's images.
+boto3==1.34.144
+requests==2.32.3
+python-dotenv==1.0.1
+
+# Dev tooling — referenced by Milestone 7's CI (flake8/black lint step)
+pytest==8.2.2
+black==24.4.2
+flake8==7.1.0
