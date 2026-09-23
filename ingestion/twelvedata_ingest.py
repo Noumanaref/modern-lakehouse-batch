@@ -57,13 +57,14 @@ def write_record_to_s3(record: dict, dt: str) -> bool:
     existing = s3.list_objects_v2(Bucket=S3_BUCKET, Prefix=key, MaxKeys=1)
     file_already_existed = existing.get("KeyCount", 0) > 0
 
-    s3.put_object(
-        Bucket=S3_BUCKET,
-        Key=key,
-        Body=json.dumps(record).encode("utf-8"),
-        ContentType="application/json",
-    )
-    return file_already_existed
+    if not file_already_existed:
+        s3.put_object(
+            Bucket=S3_BUCKET,
+            Key=key,
+            Body=json.dumps(record).encode("utf-8"),
+            ContentType="application/json",
+        )
+        return file_already_existed
 
 
 
