@@ -62,7 +62,7 @@ def write_record_to_s3(record: dict, dt: str) -> bool:
             Body=json.dumps(record).encode("utf-8"),
             ContentType="application/json",
         )
-        return file_already_existed
+    return file_already_existed
 
 
 
