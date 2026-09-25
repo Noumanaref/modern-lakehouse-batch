@@ -6,3 +6,4 @@ infra/terraform/terraform.tfstate.backup
 airflow/logs/*
 !airflow/logs/.gitkeep
 .venv/
+.env
