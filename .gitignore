@@ -7,3 +7,4 @@ airflow/logs/*
 !airflow/logs/.gitkeep
 .venv/
 .env
+venv/
