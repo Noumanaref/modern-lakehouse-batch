@@ -1,10 +1,24 @@
 USE DATABASE LAKEHOUSE_DB;
 USE SCHEMA GOLD;
 
+--  stub - injection
+-- Detect symbols in staging that do not exist in the dimension and create a placeholder row.
+INSERT INTO dim_company (symbol, company_name, updated_at)
+SELECT DISTINCT 
+    s.symbol, 
+    'Pending Profile Sync', 
+    CURRENT_TIMESTAMP()
+FROM stg_stock_prices s
+LEFT JOIN dim_company c ON s.symbol = c.symbol
+WHERE c.symbol IS NULL;
+
+
+--  The Fact Merge
+-- Now 100% safe to use a strict INNER JOIN because Step 1 guarantees every symbol exists.
 MERGE INTO fact_stock_prices AS target
 USING (
     SELECT 
-        COALESCE(c.company_key, -1) AS company_key,
+        c.company_key,
         TO_CHAR(s.price_date, 'YYYYMMDD')::INT AS date_key,
         s.open,
         s.high,
@@ -17,7 +31,7 @@ USING (
                ROW_NUMBER() OVER (PARTITION BY symbol, price_date ORDER BY ingested_at DESC) AS rn
         FROM stg_stock_prices
     ) AS s
-    LEFT JOIN dim_company c ON s.symbol = c.symbol
+    INNER JOIN dim_company c ON s.symbol = c.symbol
     WHERE s.rn = 1
 ) AS source
 ON target.company_key = source.company_key 
