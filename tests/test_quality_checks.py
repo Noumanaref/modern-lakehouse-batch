@@ -5,10 +5,6 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 def evaluate_validation_results(validator, dataset_name: str) -> bool:
-    """
-    Executes the validation suite and logs granular failure details.
-    Centralizes execution to keep dataset-specific functions DRY.
-    """
     validation_result = validator.validate()
     
     if not validation_result.success:
@@ -64,7 +60,8 @@ def validate_stock_prices(df: pd.DataFrame) -> bool:
     validator.expect_column_values_to_be_between(column="volume", min_value=0)
     
     if "high" in df.columns and "low" in df.columns:
-        validator.expect_column_pair_values_a_to_be_greater_than_b(
+        # FIX: Capitalized the A and B in the method name
+        validator.expect_column_pair_values_A_to_be_greater_than_B(
             column_A="high", 
             column_B="low", 
             or_equal=True
