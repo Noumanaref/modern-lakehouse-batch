@@ -1,7 +1,7 @@
 USE DATABASE LAKEHOUSE_DB;
 USE SCHEMA GOLD;
 
---  stub - injection
+-- Step 1: Stub Injection
 -- Detect symbols in staging that do not exist in the dimension and create a placeholder row.
 INSERT INTO dim_company (symbol, company_name, updated_at)
 SELECT DISTINCT 
@@ -12,8 +12,7 @@ FROM stg_stock_prices s
 LEFT JOIN dim_company c ON s.symbol = c.symbol
 WHERE c.symbol IS NULL;
 
-
---  The Fact Merge
+-- Step 2: The Fact Merge
 -- Now 100% safe to use a strict INNER JOIN because Step 1 guarantees every symbol exists.
 MERGE INTO fact_stock_prices AS target
 USING (

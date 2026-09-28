@@ -1,9 +1,6 @@
 USE DATABASE LAKEHOUSE_DB;
 USE SCHEMA GOLD;
 
-USE DATABASE LAKEHOUSE_DB;
-USE SCHEMA GOLD;
-
 MERGE INTO dim_company AS target
 USING (
     -- Deduplicate staging data: guarantee strictly one record per symbol
@@ -74,6 +71,3 @@ WHEN NOT MATCHED THEN
         source.cusip, 
         CURRENT_TIMESTAMP()
     );
-
-    SELECT company_key, symbol, company_name, sector, updated_at 
-FROM dim_company;
