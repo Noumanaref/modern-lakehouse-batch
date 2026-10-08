@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   # ---------- DATABASE FOR AIRFLOW ----------
@@ -18,7 +17,10 @@ services:
 
   # ---------- SETS UP AIRFLOW ----------
   airflow-init:
-    image: apache/airflow:2.9.3-python3.10
+    build:
+      context: .
+      dockerfile: DockerFile
+    user: "${AIRFLOW_UID:-50000}:0"
     depends_on:
       postgres:
         condition: service_healthy
@@ -29,9 +31,9 @@ services:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     volumes:
-      - ./dags:/opt/airflow/dags
-      - ./logs:/opt/airflow/logs
-      - ./plugins:/opt/airflow/plugins
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
       - .:/opt/airflow/project_root
     entrypoint: /bin/bash
     command:
@@ -40,7 +42,10 @@ services:
 
   # ---------- AIRFLOW WEB UI ----------
   airflow-webserver:
-    image: apache/airflow:2.9.3-python3.10
+    build:
+      context: .
+      dockerfile: DockerFile
+    user: "${AIRFLOW_UID:-50000}:0"
     depends_on:
       airflow-init:
         condition: service_completed_successfully
@@ -50,12 +55,11 @@ services:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
-      _PIP_ADDITIONAL_REQUIREMENTS: "snowflake-connector-python great-expectations==0.18.19 python-dotenv yfinance pandas"
       PYTHONPATH: "/opt/airflow/project_root"
     volumes:
-      - ./dags:/opt/airflow/dags
-      - ./logs:/opt/airflow/logs
-      - ./plugins:/opt/airflow/plugins
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
       - .:/opt/airflow/project_root
     command: webserver
     ports:
@@ -64,7 +68,10 @@ services:
 
   # ---------- AIRFLOW SCHEDULER ----------
   airflow-scheduler:
-    image: apache/airflow:2.9.3-python3.10
+    build:
+      context: .
+      dockerfile: DockerFile
+    user: "${AIRFLOW_UID:-50000}:0"
     depends_on:
       airflow-init:
         condition: service_completed_successfully
@@ -74,32 +81,13 @@ services:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
-      _PIP_ADDITIONAL_REQUIREMENTS: "snowflake-connector-python great-expectations==0.18.19 python-dotenv yfinance pandas"
       PYTHONPATH: "/opt/airflow/project_root"
     volumes:
-      - ./dags:/opt/airflow/dags
-      - ./logs:/opt/airflow/logs
-      - ./plugins:/opt/airflow/plugins
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
       - .:/opt/airflow/project_root
     command: scheduler
     restart: always
-
-  # ---------- SPARK MASTER ----------
-  spark-master:
-    image: apache/spark:3.5.1
-    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master"]
-    ports:
-      - "8081:8080"
-      - "7077:7077"
-    restart: always
-
-  # ---------- SPARK WORKER ----------
-  spark-worker:
-    image: apache/spark:3.5.1
-    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077"]
-    depends_on:
-      - spark-master
-    restart: always
-
 volumes:
   postgres-db-volume:
