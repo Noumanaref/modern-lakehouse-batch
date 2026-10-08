@@ -71,7 +71,7 @@ with DAG(
 
     quality_checks = BashOperator(
         task_id='quality_checks',
-        bash_command='python /opt/airflow/project_root/tests/run_quality_checks.py',
+        bash_command='cd /opt/airflow/project_root/tests && python run_quality_checks.py',
         retries=0
     )
 
