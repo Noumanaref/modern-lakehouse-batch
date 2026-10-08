@@ -1,4 +1,3 @@
-
 services:
   # ---------- DATABASE FOR AIRFLOW ----------
   postgres:
@@ -20,7 +19,7 @@ services:
     build:
       context: .
       dockerfile: DockerFile
-    user: "${AIRFLOW_UID:-50000}:0"
+    user: airflow
     depends_on:
       postgres:
         condition: service_healthy
@@ -32,10 +31,7 @@ services:
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       S3_RAW_BUCKET: ${S3_RAW_BUCKET}
     volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/logs:/opt/airflow/logs
-      - ./airflow/plugins:/opt/airflow/plugins
-      - .:/opt/airflow/project_root
+      - /workspaces/modern-lakehouse-batch:/opt/airflow/project_root
     entrypoint: /bin/bash
     command:
       - -c
@@ -46,7 +42,7 @@ services:
     build:
       context: .
       dockerfile: DockerFile
-    user: "${AIRFLOW_UID:-50000}:0"
+    user: airflow
     depends_on:
       airflow-init:
         condition: service_completed_successfully
@@ -56,13 +52,12 @@ services:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_FOLDER: "/opt/airflow/project_root/airflow/dags"
       PYTHONPATH: "/opt/airflow/project_root"
       S3_RAW_BUCKET: ${S3_RAW_BUCKET}
+      
     volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/logs:/opt/airflow/logs
-      - ./airflow/plugins:/opt/airflow/plugins
-      - .:/opt/airflow/project_root
+      - /workspaces/modern-lakehouse-batch:/opt/airflow/project_root
     command: webserver
     ports:
       - "8080:8080"
@@ -73,7 +68,7 @@ services:
     build:
       context: .
       dockerfile: DockerFile
-    user: "${AIRFLOW_UID:-50000}:0"
+    user: airflow
     depends_on:
       airflow-init:
         condition: service_completed_successfully
@@ -83,6 +78,7 @@ services:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_FOLDER: "/opt/airflow/project_root/airflow/dags"
       PYTHONPATH: "/opt/airflow/project_root"
       FMP_API_KEY: ${FMP_API_KEY}
       TWELVE_DATA_API_KEY: ${TWELVE_DATA_API_KEY}
@@ -94,10 +90,7 @@ services:
       S3_RAW_BUCKET: ${S3_RAW_BUCKET}
 
     volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/logs:/opt/airflow/logs
-      - ./airflow/plugins:/opt/airflow/plugins
-      - .:/opt/airflow/project_root
+      - /workspaces/modern-lakehouse-batch:/opt/airflow/project_root
     command: scheduler
     restart: always
 volumes:
