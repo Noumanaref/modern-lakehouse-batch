@@ -1,4 +1,4 @@
-# Modern Lakehouse: Batch ELT Pipeline (Stock Market Edition)
+﻿# Modern Lakehouse: Batch ELT Pipeline (Stock Market Edition)
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue)
 ![Spark](https://img.shields.io/badge/Spark-Databricks-orange)
@@ -28,7 +28,6 @@ flowchart LR
     AF -.-> SL["Slack alerts"]
 ```
 
-An interactive version lives in [`docs/diagrams/modern-lakehouse-batch.html`](docs/diagrams/modern-lakehouse-batch.html) (download and open in a browser).
 
 ## Key decisions at a glance
 
